@@ -3,7 +3,8 @@ import { expect } from 'chai';
 import { SpanStatusCode, type Tracer } from '@opentelemetry/api';
 import { hrTimeToMilliseconds, hrTimeToNanoseconds } from '@opentelemetry/core';
 import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
-import { observeDuration, recordErrorToSpan } from '../src/utils.mjs';
+import { logger, meter, observeDuration, recordErrorToSpan, tracer } from '../src/utils.mjs';
+import { Logger } from '../src/logger.mjs';
 
 describe('utils', function () {
     describe('observeDuration', function () {
@@ -91,5 +92,63 @@ describe('utils', function () {
                     },
                 });
         });
+    });
+
+    it('should return a Tracer', function () {
+        expect(tracer('test')).to.be.an('object').and.have.property('startActiveSpan').that.is.a('function');
+    });
+
+    it('should return a Meter', function () {
+        expect(meter()).to.be.an('object').and.have.property('createCounter').that.is.a('function');
+    });
+
+    it('should return a Logger', function () {
+        expect(logger('test')).to.be.an('object').that.is.instanceOf(Logger);
+    });
+
+    it('should return the same logger for the same name', function () {
+        const name = 'test';
+        expect(logger(name)).to.equal(logger(name));
+    });
+
+    it('should return different loggers for different names', function () {
+        expect(logger('test1')).not.to.equal(logger());
+    });
+
+    it('should fall back to OTEL_SERVICE_NAME', function () {
+        const serviceName = 'test';
+        process.env['OTEL_SERVICE_NAME'] = serviceName;
+        process.env['npm_package_name'] = serviceName + serviceName;
+        const instance = logger().logger as unknown;
+        if (
+            instance &&
+            typeof instance === 'object' &&
+            'instrumentationScope' in instance &&
+            typeof instance.instrumentationScope === 'object' &&
+            instance.instrumentationScope &&
+            'name' in instance.instrumentationScope
+        ) {
+            expect(instance.instrumentationScope.name).to.equal(serviceName);
+        } else {
+            this.skip();
+        }
+    });
+
+    it('should fall back to npm_package_name', function () {
+        const serviceName = 'supertest';
+        process.env['npm_package_name'] = serviceName;
+        const instance = logger().logger as unknown;
+        if (
+            instance &&
+            typeof instance === 'object' &&
+            'instrumentationScope' in instance &&
+            typeof instance.instrumentationScope === 'object' &&
+            instance.instrumentationScope &&
+            'name' in instance.instrumentationScope
+        ) {
+            expect(instance.instrumentationScope.name).to.equal(serviceName);
+        } else {
+            this.skip();
+        }
     });
 });

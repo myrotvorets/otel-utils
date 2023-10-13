@@ -77,4 +77,8 @@ export class Logger {
     public fatal(message: string): void {
         this.log(message, SeverityNumber.FATAL);
     }
+
+    public get logger(): OtelLogger {
+        return this._logger;
+    }
 }
