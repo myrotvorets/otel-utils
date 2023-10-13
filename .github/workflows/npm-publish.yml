@@ -1,0 +1,53 @@
+name: Publish Package
+
+on:
+  release:
+    types:
+      - released
+  workflow_dispatch:
+    inputs:
+      gpr:
+        default: "yes"
+        description: Publish to GPR?
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    name: Prepare source code
+    permissions:
+      contents: read
+      packages: read
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' || github.event.inputs.gpr == 'yes'
+    steps:
+      - name: Prepare source
+        uses: myrotvorets/composite-actions/node-prepublish@master
+        with:
+          registry-url: https://npm.pkg.github.com
+
+  publish:
+    name: Publish package (${{ matrix.registry }})
+    runs-on: ubuntu-latest
+    needs: prepare
+    permissions:
+      contents: read
+      packages: write
+      statuses: write
+    strategy:
+      matrix:
+        registry:
+          - gpr
+        include:
+          - registry: gpr
+            secret: GITHUB_TOKEN
+            registry_url: https://npm.pkg.github.com/
+    steps:
+      - name: Publish package
+        uses: myrotvorets/composite-actions/node-publish@master
+        with:
+          node-auth-token: ${{ secrets[matrix.secret] }}
+          registry-url: ${{ matrix.registry_url }}
+        if: github.event.inputs[matrix.registry] == 'yes' || github.event_name == 'release'
