@@ -1,0 +1,97 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and test (Node ${{ matrix.node.name }})
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, '[ci skip]') || github.event_name == 'workflow_dispatch' }}
+    permissions:
+      contents: read
+      packages: read
+    strategy:
+      matrix:
+        node:
+          - { name: Current,      version: current }
+          - { name: LTS,          version: lts/* }
+          - { name: Previous LTS, version: lts/-1 }
+    steps:
+      - name: Build and test
+        uses: myrotvorets/composite-actions/build-test-nodejs@master
+        with:
+          node-version: ${{ matrix.node.version }}
+          registry-url: https://npm.pkg.github.com
+
+  lint:
+    name: Check code style
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, '[ci skip]') || github.event_name == 'workflow_dispatch' }}
+    permissions:
+      contents: read
+      packages: read
+    env:
+      NO_UPDATE_NOTIFIER: 'true'
+      NPM_CONFIG_FUND: '0'
+      NPM_CONFIG_AUDIT: '0'
+      SUPPRESS_SUPPORT: '1'
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+
+      - name: Set up Node.js environment
+        uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
+        with:
+          node-version: 'lts/*'
+          registry-url: https://npm.pkg.github.com
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run postinstall scripts
+        run: npm rebuild && npm run prepare --if-present
+
+      - name: Check code style
+        run: npm run lint
+
+  typecheck:
+    name: Check types
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, '[ci skip]') || github.event_name == 'workflow_dispatch' }}
+    permissions:
+      contents: read
+      packages: read
+    env:
+      NO_UPDATE_NOTIFIER: 'true'
+      NPM_CONFIG_FUND: '0'
+      NPM_CONFIG_AUDIT: '0'
+      SUPPRESS_SUPPORT: '1'
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+
+      - name: Set up Node.js environment
+        uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
+        with:
+          node-version: 'lts/*'
+          registry-url: https://npm.pkg.github.com
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check code style
+        run: npm run typecheck
