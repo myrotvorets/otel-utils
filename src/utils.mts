@@ -41,15 +41,15 @@ function guessServiceName(): string {
 
 const loggers: Record<string, Logger> = {};
 
-export function tracer(name?: string, version?: string): Tracer {
+export function getTracer(name?: string, version?: string): Tracer {
     return trace.getTracer(name ?? guessServiceName(), version);
 }
 
-export function meter(name?: string, version?: string, options?: MeterOptions): Meter {
+export function getMeter(name?: string, version?: string, options?: MeterOptions): Meter {
     return metrics.getMeter(name ?? guessServiceName(), version, options);
 }
 
-export function logger(name?: string, version?: string, options?: LoggerOptions): Logger {
+export function getLogger(name?: string, version?: string, options?: LoggerOptions): Logger {
     const n = name ?? guessServiceName();
     let logger = loggers[n];
     if (!logger) {
