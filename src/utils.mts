@@ -12,6 +12,8 @@ import { type LoggerOptions, logs } from '@opentelemetry/api-logs';
 import { hrTime, hrTimeDuration } from '@opentelemetry/core';
 import { Logger } from './logger.mjs';
 
+export type { Meter, Tracer };
+
 export function recordErrorToSpan(e: unknown, span: Span): Error {
     let err: Error;
     if (!(e instanceof Error)) {
