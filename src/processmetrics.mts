@@ -49,7 +49,7 @@ function createMemUsageCounter(meter: Meter): ObservableUpDownCounter {
     });
 }
 
-export async function initProcessMetrcis(): Promise<void> {
+export async function initProcessMetrics(): Promise<void> {
     const meter = getMeter();
     const cpuTime = meter.createObservableCounter('process.cpu.time', {
         unit: 's',
