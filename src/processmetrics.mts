@@ -27,7 +27,7 @@ async function getMemoryStats(): Promise<[number, number]> {
         let vmrss, vmsize;
         const lines = (await readFile('/proc/self/status', 'utf-8')).split('\n');
         for (const line of lines) {
-            const [key, value] = line.split(/[: ]+/u, 2);
+            const [key, value] = line.split(/[\s:]+/u, 2);
             if (key === 'VmRSS') {
                 vmrss = +(value ?? NaN);
             } else if (key === 'VmSize') {
@@ -95,7 +95,7 @@ export async function initProcessMetrics(): Promise<void> {
             observer.observe(cpuTime, usage.systemCPUTime / 1e6, { state: 'system' });
 
             // cpuUsage is in microseconds, hrtime is in nanoseconds
-            const elapsedUs = Number((observationTime - lastObservationTime) / 1000n);
+            const elapsedUs = Number((observationTime - lastObservationTime) * 1000n);
             observer.observe(cpuUtilization, (usage.userCPUTime - lastUsage.userCPUTime) / elapsedUs / cpuCount, {
                 state: 'user',
             });
