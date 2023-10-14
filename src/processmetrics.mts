@@ -95,7 +95,7 @@ export async function initProcessMetrics(): Promise<void> {
             observer.observe(cpuTime, usage.systemCPUTime / 1e6, { state: 'system' });
 
             // cpuUsage is in microseconds, hrtime is in nanoseconds
-            const elapsedUs = Number((observationTime - lastObservationTime) * 1000n);
+            const elapsedUs = Number((observationTime - lastObservationTime) / 1000n);
             observer.observe(cpuUtilization, (usage.userCPUTime - lastUsage.userCPUTime) / elapsedUs / cpuCount, {
                 state: 'user',
             });
