@@ -57,5 +57,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@myrotvorets/create-server": "^2.2.0"
   }
 }
