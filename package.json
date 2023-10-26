@@ -59,6 +59,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@myrotvorets/create-server": "^2.2.0"
+    "@myrotvorets/create-server": "^3.0.0"
   }
 }
