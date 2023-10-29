@@ -25,10 +25,21 @@
     "./dist/src/*.d.mts",
     "./dist/src/*.map"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/myrotvorets/otel-utils.git"
+  },
+  "bugs": {
+    "url": "https://github.com/myrotvorets/otel-utils/issues"
+  },
+  "homepage": "https://github.com/myrotvorets/otel-utils#readme",
   "peerDependencies": {
     "@opentelemetry/api": "^1.6.0",
     "@opentelemetry/api-logs": "^0.44.0",
     "@opentelemetry/core": "^1.17.1"
+  },
+  "dependencies": {
+    "@myrotvorets/create-server": "^3.1.1"
   },
   "devDependencies": {
     "@myrotvorets/eslint-config-myrotvorets-ts": "^2.22.6",
@@ -56,9 +67,7 @@
     "test": "test"
   },
   "publishConfig": {
-    "access": "public"
-  },
-  "dependencies": {
-    "@myrotvorets/create-server": "^3.0.0"
+    "access": "public",
+    "provenance": true
   }
 }
