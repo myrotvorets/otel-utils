@@ -54,7 +54,7 @@ export async function initProcessMetrics(): Promise<void> {
     const cpuTime = meter.createObservableCounter('process.cpu.time', {
         unit: 's',
         description: 'Total CPU seconds broken down by different states.',
-        valueType: ValueType.INT,
+        valueType: ValueType.DOUBLE,
     });
 
     const cpuUtilization = meter.createObservableGauge('process.cpu.utilization', {
