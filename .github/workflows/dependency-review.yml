@@ -18,6 +18,7 @@ jobs:
           allowed-endpoints: >
             api.deps.dev:443
             api.github.com:443
+            api.securityscorecards.dev:443
             github.com:443
 
       - name: Check out the source code
@@ -25,3 +26,5 @@ jobs:
 
       - name: Review dependencies
         uses: actions/dependency-review-action@5bbc3ba658137598168acb2ab73b21c432dd411b # v4.2.5
+        with:
+          comment-summary-in-pr: true

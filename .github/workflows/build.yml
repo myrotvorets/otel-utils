@@ -92,5 +92,5 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Check code style
+      - name: Check types
         run: npm run typecheck

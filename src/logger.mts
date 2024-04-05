@@ -1,4 +1,4 @@
-import { LogAttributeValue, LogAttributes, type Logger as OtelLogger, SeverityNumber } from '@opentelemetry/api-logs';
+import { AnyValue, LogAttributes, type Logger as OtelLogger, SeverityNumber } from '@opentelemetry/api-logs';
 
 export class Logger {
     private readonly _logger: OtelLogger;
@@ -37,7 +37,7 @@ export class Logger {
         this._attributes = {};
     }
 
-    public setAttribute(key: string, value: LogAttributeValue): void {
+    public setAttribute(key: string, value: AnyValue): void {
         this._attributes[key] = value;
     }
 
