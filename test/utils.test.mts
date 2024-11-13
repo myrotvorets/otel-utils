@@ -108,6 +108,7 @@ describe('utils', function () {
 
     it('should return the same logger for the same name', function () {
         const name = 'test';
+        // eslint-disable-next-line sonarjs/no-same-argument-assert
         expect(getLogger(name)).to.equal(getLogger(name));
     });
 
