@@ -10,4 +10,4 @@ module.exports = {
         process.env.GITHUB_ACTIONS === 'true' ? 'mocha-reporter-gha=-' : null,
         process.env.SONARSCANNER === 'true' ? 'mocha-reporter-sonarqube=test-report.xml' : null,
     ].filter(Boolean),
-}
+};
