@@ -17,7 +17,9 @@ export async function createServer(
             unit: '{count}',
             valueType: ValueType.INT,
         })
-        .addCallback((observable) => server.getConnections((error, count) => observable.observe(error ? NaN : count)));
+        .addCallback((observable) => {
+            server.getConnections((error, count) => observable.observe(error ? NaN : count));
+        });
 
     const totalConnectionsCounter = meter.createCounter('server.connections.total', {
         description: 'Number of connections.',
