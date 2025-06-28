@@ -8,8 +8,8 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "mocha test",
-    "test:coverage": "c8 mocha test",
+    "test": "tsimp --test --test-reporter=spec --test-reporter-destination=stdout --test-reporter=node-reporter-sonarqube --test-reporter-destination=test-report.xml --test-reporter=node-reporter-gha --test-reporter-destination=stdout test/*.test.mts",
+    "test:coverage": "c8 npm test",
     "lint": "eslint -f gha .",
     "prepack": "npm run build"
   },
@@ -48,17 +48,13 @@
     "@opentelemetry/core": "^1.23.0",
     "@opentelemetry/sdk-logs": "^0.202.0",
     "@opentelemetry/sdk-trace-base": "^1.23.0",
-    "@types/chai": "^5.2.2",
     "@types/mocha": "^10.0.10",
+    "@types/node": "^24.0.6",
     "c8": "^10.1.3",
-    "chai": "^5.2.0",
     "eslint-formatter-gha": "^1.5.2",
-    "eslint-plugin-mocha": "^11.1.0",
-    "mocha": "^11.0.0",
-    "mocha-multi": "^1.1.7",
-    "mocha-reporter-gha": "^1.1.1",
-    "mocha-reporter-sonarqube": "^2.1.1",
-    "ts-node": "^10.9.2",
+    "node-reporter-gha": "^2.0.5",
+    "node-reporter-sonarqube": "^1.0.2",
+    "tsimp": "^2.0.12",
     "typescript": "^5.8.3"
   },
   "directories": {
