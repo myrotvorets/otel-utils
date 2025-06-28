@@ -1,33 +1,35 @@
+import { before, describe, it } from 'node:test';
+import assert, { equal } from 'node:assert/strict';
 import { setTimeout } from 'node:timers/promises';
-import { expect } from 'chai';
 import { SpanStatusCode, type Tracer } from '@opentelemetry/api';
 import { hrTimeToMilliseconds, hrTimeToNanoseconds } from '@opentelemetry/core';
 import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+import { deepEqual, notDeepEqual } from 'node:assert';
 import { getLogger, getMeter, getTracer, observeDuration, recordErrorToSpan } from '../src/utils.mjs';
 import { Logger } from '../src/logger.mjs';
 
-describe('utils', function () {
-    describe('observeDuration', function () {
-        it('should work with sync functions', async function () {
+await describe('utils', async function () {
+    await describe('observeDuration', async function () {
+        await it('should work with sync functions', async function () {
             const func = (): void => {
                 /* Do nothing */
             };
 
             const duration = await observeDuration(func);
             const actual = hrTimeToNanoseconds(duration);
-            expect(actual).to.be.greaterThan(0);
+            equal(actual > 0, true);
         });
 
-        it('should work with async functions', async function () {
+        await it('should work with async functions', async function () {
             const timeout = 10;
             const func = (): Promise<void> => setTimeout(timeout);
             const duration = await observeDuration(func);
             const actual = hrTimeToMilliseconds(duration);
-            expect(actual).to.be.greaterThanOrEqual(timeout - 2);
+            equal(actual >= timeout - 2, true);
         });
     });
 
-    describe('recordErrorToSpan', function () {
+    await describe('recordErrorToSpan', async function () {
         let provider: BasicTracerProvider;
         let tracer: Tracer;
 
@@ -36,9 +38,9 @@ describe('utils', function () {
             tracer = provider.getTracer('test');
         });
 
-        it('should convert non-errors to Error', function () {
+        await it('should convert non-errors to Error', function () {
             const expectedMessage = 'message';
-            let err;
+            let err: unknown;
             const span = tracer.startActiveSpan('span', (span) => {
                 try {
                     err = recordErrorToSpan(expectedMessage, span);
@@ -48,25 +50,28 @@ describe('utils', function () {
                 }
             });
 
-            expect(err).to.be.instanceOf(Error).and.have.property('message', expectedMessage);
-            expect(span).to.be.an('object').that.has.property('status').that.has.property('code', SpanStatusCode.ERROR);
-            expect(span)
-                .to.have.property('events')
-                .that.has.lengthOf(1)
-                .and.containSubset({
-                    0: {
-                        name: 'exception',
-                        attributes: {
-                            'exception.type': 'Error',
-                            'exception.message': expectedMessage,
-                        },
-                    },
-                });
+            assert(typeof err === 'object');
+            equal(err instanceof Error, true);
+            equal((err as Error).message, expectedMessage);
+
+            const spn = span as unknown as Record<string, unknown>;
+            equal(typeof spn, 'object');
+            equal(typeof spn['status'], 'object');
+            equal((spn['status'] as Record<string, unknown>)['code'], SpanStatusCode.ERROR);
+
+            equal(Array.isArray(spn['events']), true);
+            equal((spn['events'] as unknown[]).length, 1);
+            const event = (spn['events'] as unknown[])[0] as Record<string, unknown>;
+            equal(typeof event, 'object');
+            equal(event['name'], 'exception');
+            equal(typeof event['attributes'], 'object');
+            equal((event['attributes'] as Record<string, unknown>)['exception.type'], 'Error');
+            equal((event['attributes'] as Record<string, unknown>)['exception.message'], expectedMessage);
         });
 
-        it('should record errors', function () {
+        await it('should record errors', function () {
             const error = new TypeError('message');
-            let err;
+            let err: unknown;
             const span = tracer.startActiveSpan('span', (span) => {
                 try {
                     err = recordErrorToSpan(error, span);
@@ -76,47 +81,55 @@ describe('utils', function () {
                 }
             });
 
-            expect(err).to.be.instanceOf(TypeError).and.have.property('message', error.message);
-            expect(span).to.be.an('object').that.has.property('status').that.has.property('code', SpanStatusCode.ERROR);
-            expect(span)
-                .to.have.property('events')
-                .that.has.lengthOf(1)
-                .and.containSubset({
-                    0: {
-                        name: 'exception',
-                        attributes: {
-                            'exception.type': error.name,
-                            'exception.message': error.message,
-                            'exception.stacktrace': error.stack,
-                        },
-                    },
-                });
+            assert(typeof err === 'object');
+            equal(err instanceof TypeError, true);
+            equal((err as Error).message, error.message);
+
+            const spn = span as unknown as Record<string, unknown>;
+            equal(typeof spn, 'object');
+            equal(typeof spn['status'], 'object');
+            equal((spn['status'] as Record<string, unknown>)['code'], SpanStatusCode.ERROR);
+
+            equal(Array.isArray(spn['events']), true);
+            equal((spn['events'] as unknown[]).length, 1);
+            const event = (spn['events'] as unknown[])[0] as Record<string, unknown>;
+            equal(typeof event, 'object');
+            equal(event['name'], 'exception');
+            equal(typeof event['attributes'], 'object');
+            equal((event['attributes'] as Record<string, unknown>)['exception.type'], error.name);
+            equal((event['attributes'] as Record<string, unknown>)['exception.message'], error.message);
+            equal((event['attributes'] as Record<string, unknown>)['exception.stacktrace'], error.stack);
         });
     });
 
-    it('should return a Tracer', function () {
-        expect(getTracer('test')).to.be.an('object').and.have.property('startActiveSpan').that.is.a('function');
+    await it('should return a Tracer', function () {
+        const tracer = getTracer('test');
+        equal(typeof tracer, 'object');
+        equal(typeof tracer.startActiveSpan, 'function');
     });
 
-    it('should return a Meter', function () {
-        expect(getMeter()).to.be.an('object').and.have.property('createCounter').that.is.a('function');
+    await it('should return a Meter', function () {
+        const meter = getMeter();
+        equal(typeof meter, 'object');
+        equal(typeof meter.createCounter, 'function');
     });
 
-    it('should return a Logger', function () {
-        expect(getLogger('test')).to.be.an('object').that.is.instanceOf(Logger);
+    await it('should return a Logger', function () {
+        const logger = getLogger('test');
+        equal(typeof logger, 'object');
+        equal(logger instanceof Logger, true);
     });
 
-    it('should return the same logger for the same name', function () {
+    await it('should return the same logger for the same name', function () {
         const name = 'test';
-        // eslint-disable-next-line sonarjs/no-same-argument-assert
-        expect(getLogger(name)).to.equal(getLogger(name));
+        deepEqual(getLogger(name), getLogger(name));
     });
 
-    it('should return different loggers for different names', function () {
-        expect(getLogger('test1')).not.to.equal(getLogger());
+    await it('should return different loggers for different names', function () {
+        notDeepEqual(getLogger('test1'), getLogger('test'));
     });
 
-    it('should fall back to OTEL_SERVICE_NAME', function () {
+    await it('should fall back to OTEL_SERVICE_NAME', function (t) {
         const serviceName = 'test';
         process.env['OTEL_SERVICE_NAME'] = serviceName;
         process.env['npm_package_name'] = serviceName + serviceName;
@@ -129,13 +142,13 @@ describe('utils', function () {
             instance.instrumentationScope &&
             'name' in instance.instrumentationScope
         ) {
-            expect(instance.instrumentationScope.name).to.equal(serviceName);
+            equal(instance.instrumentationScope.name, serviceName);
         } else {
-            this.skip();
+            t.skip();
         }
     });
 
-    it('should fall back to npm_package_name', function () {
+    await it('should fall back to npm_package_name', function (t) {
         const serviceName = 'supertest';
         process.env['npm_package_name'] = serviceName;
         const instance = getLogger().logger as unknown;
@@ -147,9 +160,9 @@ describe('utils', function () {
             instance.instrumentationScope &&
             'name' in instance.instrumentationScope
         ) {
-            expect(instance.instrumentationScope.name).to.equal(serviceName);
+            equal(instance.instrumentationScope.name, serviceName);
         } else {
-            this.skip();
+            t.skip();
         }
     });
 });

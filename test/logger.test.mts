@@ -1,5 +1,5 @@
-import { type Mock, mock } from 'node:test';
-import { expect } from 'chai';
+import assert, { equal } from 'node:assert/strict';
+import { type Mock, afterEach, before, describe, it, mock } from 'node:test';
 import type { Context } from '@opentelemetry/api';
 import { SeverityNumber, logs } from '@opentelemetry/api-logs';
 import { type LogRecord, LogRecordProcessor, LoggerProvider } from '@opentelemetry/sdk-logs';
@@ -21,14 +21,15 @@ class TestLogRecordProcessor implements LogRecordProcessor {
     }
 }
 
-describe('Logger', function () {
+await describe('Logger', async function () {
     let logger: Logger;
 
     before(function () {
         onEmitMock = mock.fn();
 
-        const loggerProvider = new LoggerProvider();
-        loggerProvider.addLogRecordProcessor(new TestLogRecordProcessor());
+        const loggerProvider = new LoggerProvider({
+            processors: [new TestLogRecordProcessor()],
+        });
         logs.setGlobalLoggerProvider(loggerProvider);
 
         logger = new Logger(loggerProvider.getLogger('test'));
@@ -39,140 +40,148 @@ describe('Logger', function () {
         mock.reset();
     });
 
-    describe('#log', function () {
-        it('should log a message', function () {
+    await describe('#log', async function () {
+        await it('should log a message', function () {
             const expectedMessage = "I've got a message to say";
             const expectedSeverity = SeverityNumber.UNSPECIFIED;
             logger.log(expectedMessage, expectedSeverity);
 
-            expect(onEmitMock.mock.callCount()).to.equal(1);
-            expect(onEmitMock.mock.calls[0]!.arguments[0]).to.be.an('object').that.includes({
-                body: expectedMessage,
-                severityNumber: expectedSeverity,
-                severityText: '',
-            });
+            equal(onEmitMock.mock.callCount(), 1);
+            assert(Array.isArray(onEmitMock.mock.calls));
+            assert(onEmitMock.mock.calls[0] !== undefined);
+            assert(Array.isArray(onEmitMock.mock.calls[0].arguments));
+            equal(typeof onEmitMock.mock.calls[0].arguments[0], 'object');
+            equal(onEmitMock.mock.calls[0].arguments[0].body, expectedMessage);
+            equal(onEmitMock.mock.calls[0].arguments[0].severityNumber, expectedSeverity);
+            equal(onEmitMock.mock.calls[0].arguments[0].severityText, '');
         });
     });
 
-    describe('#trace', function () {
-        it('should log a message', function () {
+    await describe('#trace', async function () {
+        await it('should log a message', function () {
             const expectedMessage = "I've got a message to say";
             const expectedSeverity = SeverityNumber.TRACE;
             logger.trace(expectedMessage);
-
-            expect(onEmitMock.mock.callCount()).to.equal(1);
-            expect(onEmitMock.mock.calls[0]!.arguments[0]).to.be.an('object').that.includes({
-                body: expectedMessage,
-                severityNumber: expectedSeverity,
-                severityText: 'TRACE',
-            });
+            equal(onEmitMock.mock.callCount(), 1);
+            assert(Array.isArray(onEmitMock.mock.calls));
+            assert(onEmitMock.mock.calls[0] !== undefined);
+            assert(Array.isArray(onEmitMock.mock.calls[0].arguments));
+            equal(typeof onEmitMock.mock.calls[0].arguments[0], 'object');
+            equal(onEmitMock.mock.calls[0].arguments[0].body, expectedMessage);
+            equal(onEmitMock.mock.calls[0].arguments[0].severityNumber, expectedSeverity);
+            equal(onEmitMock.mock.calls[0].arguments[0].severityText, 'TRACE');
         });
     });
 
-    describe('#debug', function () {
-        it('should log a message', function () {
+    await describe('#debug', async function () {
+        await it('should log a message', function () {
             const expectedMessage = "I've got a message to say";
             const expectedSeverity = SeverityNumber.DEBUG;
             logger.debug(expectedMessage);
-
-            expect(onEmitMock.mock.callCount()).to.equal(1);
-            expect(onEmitMock.mock.calls[0]!.arguments[0]).to.be.an('object').that.includes({
-                body: expectedMessage,
-                severityNumber: expectedSeverity,
-                severityText: 'DEBUG',
-            });
+            equal(onEmitMock.mock.callCount(), 1);
+            assert(Array.isArray(onEmitMock.mock.calls));
+            assert(onEmitMock.mock.calls[0] !== undefined);
+            assert(Array.isArray(onEmitMock.mock.calls[0].arguments));
+            equal(typeof onEmitMock.mock.calls[0].arguments[0], 'object');
+            equal(onEmitMock.mock.calls[0].arguments[0].body, expectedMessage);
+            equal(onEmitMock.mock.calls[0].arguments[0].severityNumber, expectedSeverity);
+            equal(onEmitMock.mock.calls[0].arguments[0].severityText, 'DEBUG');
         });
     });
 
-    describe('#info', function () {
-        it('should log a message', function () {
+    await describe('#info', async function () {
+        await it('should log a message', function () {
             const expectedMessage = "I've got a message to say";
             const expectedSeverity = SeverityNumber.INFO;
             logger.info(expectedMessage);
-
-            expect(onEmitMock.mock.callCount()).to.equal(1);
-            expect(onEmitMock.mock.calls[0]!.arguments[0]).to.be.an('object').that.includes({
-                body: expectedMessage,
-                severityNumber: expectedSeverity,
-                severityText: 'INFO',
-            });
+            equal(onEmitMock.mock.callCount(), 1);
+            assert(Array.isArray(onEmitMock.mock.calls));
+            assert(onEmitMock.mock.calls[0] !== undefined);
+            assert(Array.isArray(onEmitMock.mock.calls[0].arguments));
+            equal(typeof onEmitMock.mock.calls[0].arguments[0], 'object');
+            equal(onEmitMock.mock.calls[0].arguments[0].body, expectedMessage);
+            equal(onEmitMock.mock.calls[0].arguments[0].severityNumber, expectedSeverity);
+            equal(onEmitMock.mock.calls[0].arguments[0].severityText, 'INFO');
         });
     });
 
-    describe('#warning', function () {
-        it('should log a message', function () {
+    await describe('#warning', async function () {
+        await it('should log a message', function () {
             const expectedMessage = "I've got a message to say";
             const expectedSeverity = SeverityNumber.WARN;
             logger.warning(expectedMessage);
-
-            expect(onEmitMock.mock.callCount()).to.equal(1);
-            expect(onEmitMock.mock.calls[0]!.arguments[0]).to.be.an('object').that.includes({
-                body: expectedMessage,
-                severityNumber: expectedSeverity,
-                severityText: 'WARN',
-            });
+            equal(onEmitMock.mock.callCount(), 1);
+            assert(Array.isArray(onEmitMock.mock.calls));
+            assert(onEmitMock.mock.calls[0] !== undefined);
+            assert(Array.isArray(onEmitMock.mock.calls[0].arguments));
+            equal(typeof onEmitMock.mock.calls[0].arguments[0], 'object');
+            equal(onEmitMock.mock.calls[0].arguments[0].body, expectedMessage);
+            equal(onEmitMock.mock.calls[0].arguments[0].severityNumber, expectedSeverity);
+            equal(onEmitMock.mock.calls[0].arguments[0].severityText, 'WARN');
         });
     });
 
-    describe('#error', function () {
-        it('should log a message', function () {
+    await describe('#error', async function () {
+        await it('should log a message', function () {
             const expectedMessage = "I've got a message to say";
             const expectedSeverity = SeverityNumber.ERROR;
             logger.error(expectedMessage);
-
-            expect(onEmitMock.mock.callCount()).to.equal(1);
-            expect(onEmitMock.mock.calls[0]!.arguments[0]).to.be.an('object').that.includes({
-                body: expectedMessage,
-                severityNumber: expectedSeverity,
-                severityText: 'ERROR',
-            });
+            equal(onEmitMock.mock.callCount(), 1);
+            assert(Array.isArray(onEmitMock.mock.calls));
+            assert(onEmitMock.mock.calls[0] !== undefined);
+            assert(Array.isArray(onEmitMock.mock.calls[0].arguments));
+            equal(typeof onEmitMock.mock.calls[0].arguments[0], 'object');
+            equal(onEmitMock.mock.calls[0].arguments[0].body, expectedMessage);
+            equal(onEmitMock.mock.calls[0].arguments[0].severityNumber, expectedSeverity);
+            equal(onEmitMock.mock.calls[0].arguments[0].severityText, 'ERROR');
         });
     });
 
-    describe('#fatal', function () {
-        it('should log a message', function () {
+    await describe('#fatal', async function () {
+        await it('should log a message', function () {
             const expectedMessage = "I've got a message to say";
             const expectedSeverity = SeverityNumber.FATAL;
             logger.fatal(expectedMessage);
-
-            expect(onEmitMock.mock.callCount()).to.equal(1);
-            expect(onEmitMock.mock.calls[0]!.arguments[0]).to.be.an('object').that.includes({
-                body: expectedMessage,
-                severityNumber: expectedSeverity,
-                severityText: 'FATAL',
-            });
+            equal(onEmitMock.mock.callCount(), 1);
+            assert(Array.isArray(onEmitMock.mock.calls));
+            assert(onEmitMock.mock.calls[0] !== undefined);
+            assert(Array.isArray(onEmitMock.mock.calls[0].arguments));
+            equal(typeof onEmitMock.mock.calls[0].arguments[0], 'object');
+            equal(onEmitMock.mock.calls[0].arguments[0].body, expectedMessage);
+            equal(onEmitMock.mock.calls[0].arguments[0].severityNumber, expectedSeverity);
+            equal(onEmitMock.mock.calls[0].arguments[0].severityText, 'FATAL');
         });
     });
 
-    describe('#setAttribute', function () {
-        it('should set an attribute', function () {
+    await describe('#setAttribute', async function () {
+        await it('should set an attribute', function () {
             const attribute = 'foo';
             const value = 'bar';
             logger.setAttribute(attribute, value);
             logger.debug('Test');
-
-            expect(onEmitMock.mock.callCount()).to.equal(1);
-            expect(onEmitMock.mock.calls[0]!.arguments[0])
-                .to.be.an('object')
-                .that.deep.includes({
-                    attributes: {
-                        [attribute]: value,
-                    },
-                });
+            equal(onEmitMock.mock.callCount(), 1);
+            assert(Array.isArray(onEmitMock.mock.calls));
+            assert(onEmitMock.mock.calls[0] !== undefined);
+            assert(Array.isArray(onEmitMock.mock.calls[0].arguments));
+            equal(typeof onEmitMock.mock.calls[0].arguments[0], 'object');
+            equal(typeof onEmitMock.mock.calls[0].arguments[0].attributes, 'object');
+            equal(onEmitMock.mock.calls[0].arguments[0].attributes[attribute], value);
         });
     });
 
-    describe('#clearAttributes', function () {
-        it('should clear all attributes', function () {
+    await describe('#clearAttributes', async function () {
+        await it('should clear all attributes', function () {
             logger.setAttribute('foo', 'bar');
             logger.setAttribute('baz', 'qux');
             logger.clearAttributes();
             logger.debug('Test');
-
-            expect(onEmitMock.mock.callCount()).to.equal(1);
-            expect(onEmitMock.mock.calls[0]!.arguments[0]).to.be.an('object').that.deep.includes({
-                attributes: {},
-            });
+            equal(onEmitMock.mock.callCount(), 1);
+            assert(Array.isArray(onEmitMock.mock.calls));
+            assert(onEmitMock.mock.calls[0] !== undefined);
+            assert(Array.isArray(onEmitMock.mock.calls[0].arguments));
+            equal(typeof onEmitMock.mock.calls[0].arguments[0], 'object');
+            equal(typeof onEmitMock.mock.calls[0].arguments[0].attributes, 'object');
+            equal(Object.keys(onEmitMock.mock.calls[0].arguments[0].attributes).length, 0);
         });
     });
 });
