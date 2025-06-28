@@ -27,8 +27,9 @@ describe('Logger', function () {
     before(function () {
         onEmitMock = mock.fn();
 
-        const loggerProvider = new LoggerProvider();
-        loggerProvider.addLogRecordProcessor(new TestLogRecordProcessor());
+        const loggerProvider = new LoggerProvider({
+            processors: [new TestLogRecordProcessor()],
+        });
         logs.setGlobalLoggerProvider(loggerProvider);
 
         logger = new Logger(loggerProvider.getLogger('test'));
