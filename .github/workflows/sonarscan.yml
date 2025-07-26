@@ -19,12 +19,20 @@ jobs:
     permissions:
       contents: read
       packages: read
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name && github.event.sender.login != 'dependabot[bot]' ||
-      github.event_name == 'push' && !contains(github.event.head_commit.message, '[ci skip]')
     steps:
+      - name: Verify SONAR_TOKEN
+        id: sonar_token
+        run: |
+          if [ -z "${{ secrets.SONAR_TOKEN }}" ]; then
+            echo has_token=0 >> "${GITHUB_OUTPUT}";
+          else
+            echo has_token=1 >> "${GITHUB_OUTPUT}";
+          fi
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
       - name: Run SonarCloud analysis
+        if: steps.sonar_token.outputs.has_token == '1'
         uses: myrotvorets/composite-actions/node-sonarscan@master
         with:
           sonar-token: ${{ secrets.SONAR_TOKEN }}
