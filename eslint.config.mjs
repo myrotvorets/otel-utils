@@ -4,7 +4,7 @@ import globals from 'globals';
 /** @type {import('eslint').Linter.Config[]} */
 export default [
     {
-        ignores: ['dist/**', '.tsimp/**'],
+        ignores: ['dist/**'],
     },
     ...MyrotvoretsConfig,
     {
