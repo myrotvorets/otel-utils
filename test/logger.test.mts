@@ -2,7 +2,7 @@ import assert, { equal } from 'node:assert/strict';
 import { type Mock, afterEach, before, describe, it, mock } from 'node:test';
 import type { Context } from '@opentelemetry/api';
 import { SeverityNumber, logs } from '@opentelemetry/api-logs';
-import { type LogRecord, LogRecordProcessor, LoggerProvider } from '@opentelemetry/sdk-logs';
+import { LogRecordProcessor, LoggerProvider, type SdkLogRecord } from '@opentelemetry/sdk-logs';
 import { Logger } from '../src/logger.mjs';
 
 let onEmitMock: Mock<LogRecordProcessor['onEmit']>;
@@ -12,7 +12,7 @@ class TestLogRecordProcessor implements LogRecordProcessor {
         return Promise.resolve();
     }
 
-    public onEmit(logRecord: LogRecord, context: Context): void {
+    public onEmit(logRecord: SdkLogRecord, context: Context): void {
         onEmitMock(logRecord, context);
     }
 
