@@ -1,7 +1,7 @@
 {
   "name": "@myrotvorets/otel-utils",
   "description": "OpenTelemetry-related utilities",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "type": "module",
   "typings": "./dist/src/index.d.mts",
   "exports": "./dist/src/index.mjs",
