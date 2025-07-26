@@ -8,8 +8,9 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "tsimp --test --test-reporter=spec --test-reporter-destination=stdout --test-reporter=node-reporter-sonarqube --test-reporter-destination=test-report.xml --test-reporter=node-reporter-gha --test-reporter-destination=stdout test/*.test.mts",
-    "test:coverage": "c8 npm test",
+    "test": "node --import=./loader.mjs --test-reporter=node-reporter-gha --test-reporter-destination=stdout --test-reporter=spec --test-reporter-destination=stdout --test test/*.test.mts",
+    "test:coverage": "c8 node --import=./loader.mjs --test test/*.test.mts",
+    "test:sonarqube": "c8 node --import=./loader.mjs --test-reporter=node-reporter-sonarqube --test-reporter-destination=test-report.xml --test-reporter=spec --test-reporter-destination=stdout --test test/*.test.mts",
     "lint": "eslint -f gha .",
     "prepack": "npm run build"
   },
@@ -54,7 +55,7 @@
     "eslint-formatter-gha": "^1.5.2",
     "node-reporter-gha": "^2.0.5",
     "node-reporter-sonarqube": "^1.0.2",
-    "tsimp": "^2.0.12",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "directories": {

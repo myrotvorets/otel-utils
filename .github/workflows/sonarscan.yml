@@ -36,5 +36,5 @@ jobs:
         uses: myrotvorets/composite-actions/node-sonarscan@master
         with:
           sonar-token: ${{ secrets.SONAR_TOKEN }}
-          test-script: 'test:coverage'
+          test-script: 'test:sonarqube'
           registry-url: https://npm.pkg.github.com
