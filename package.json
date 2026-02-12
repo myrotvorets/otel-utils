@@ -36,7 +36,7 @@
   "homepage": "https://github.com/myrotvorets/otel-utils#readme",
   "peerDependencies": {
     "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/api-logs": "^0.203.0",
+    "@opentelemetry/api-logs": "^0.212.0",
     "@opentelemetry/core": "^2.0.0"
   },
   "dependencies": {
