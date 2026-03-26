@@ -33,7 +33,7 @@ jobs:
 
       - name: Run SonarCloud analysis
         if: steps.sonar_token.outputs.has_token == '1'
-        uses: myrotvorets/composite-actions/node-sonarscan@master
+        uses: myrotvorets/composite-actions/node-sonarscan@0b8b877ead5e4e6718786803b91d295017964111 # master
         with:
           sonar-token: ${{ secrets.SONAR_TOKEN }}
           test-script: 'test:sonarqube'
